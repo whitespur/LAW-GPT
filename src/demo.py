@@ -22,6 +22,12 @@ def set_seed(args):
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     random.seed(args.seed)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # 打印设备类型
+    print("Device:", device)
+    # 打印设备数量
+    print("Device count:", torch.cuda.device_count())
     # if args.n_gpu > 0:
     #     torch.cuda.manual_seed_all(args.seed)
 
@@ -36,7 +42,7 @@ def main():
     parser.add_argument("--seed", type=int, default=3407)
     args = parser.parse_args()
 
-    # set_seed(args)
+    set_seed(args)
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
 
     #os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
@@ -49,7 +55,9 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(args.model_path, trust_remote_code=True)
     model_class = ChatGLMForConditionalGeneration 
 
-    logger.info("Setup Model")
+    device_count0 = torch.cuda.device_count()
+    logger.info("Setup Model device_count0 is ",device_count0)
+    
     num_layers = read_json(os.path.join(args.model_path , "config.json"))["num_layers"]
     device_ids = list(range(torch.cuda.device_count()))
 
